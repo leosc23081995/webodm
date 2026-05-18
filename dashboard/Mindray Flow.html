@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mindray — Fluxograma de Processos · Blueprint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <style>
+    html, body { margin: 0; padding: 0; background: #02060d; font-family: "Inter", system-ui, sans-serif; color: #e8f1ff; }
+    #root { width: 100vw; height: 100vh; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="data.js"></script>
+  <script type="text/babel" src="icons.jsx"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="v1-blueprint.jsx"></script>
+  <script type="text/babel" src="v2-conveyor.jsx"></script>
+  <script type="text/babel" src="v3-matrix.jsx"></script>
+  <script type="text/babel" src="v4-cascade.jsx"></script>
+  <script type="text/babel" src="v5-topology.jsx"></script>
+  <script type="text/babel" src="v6-floorplan.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+    function App() {
+      const DC = window.DesignCanvas, DCSection = window.DCSection, DCArtboard = window.DCArtboard;
+      return (
+        <DC
+          title="Mindray — Automação Laboratorial"
+          subtitle="Fluxograma de processos · 5 variações em blueprint"
+          background="#02060d"
+        >
+          <DCSection id="variations" title="Seis metáforas visuais" subtitle="Cinco visualizações conceituais + a planta real do Lab. Genoma. Clique em qualquer quadro para abrir em tela cheia.">
+            <DCArtboard id="v1" label="01 · Blueprint Schematic" width={1800} height={1180}>
+              <V1Blueprint />
+            </DCArtboard>
+            <DCArtboard id="v2" label="02 · Esteira Linear" width={1800} height={1000}>
+              <V2Conveyor />
+            </DCArtboard>
+            <DCArtboard id="v3" label="03 · Matriz Swimlane" width={1800} height={1100}>
+              <V3Matrix />
+            </DCArtboard>
+            <DCArtboard id="v4" label="04 · Cascata de TAT" width={1400} height={1200}>
+              <V4Cascade />
+            </DCArtboard>
+            <DCArtboard id="v5" label="05 · Topologia de Rede" width={1800} height={1100}>
+              <V5Topology />
+            </DCArtboard>
+            <DCArtboard id="v6" label="06 · Planta Baixa Genoma" width={1800} height={1200}>
+              <V6FloorPlan />
+            </DCArtboard>
+          </DCSection>
+        </DC>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>

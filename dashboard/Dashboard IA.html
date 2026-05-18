@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard LRA — Arquitetura de Informação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <style>
+    html, body { margin: 0; padding: 0; background: var(--bp-void); color: var(--bp-ink); font-family: var(--font-sans); }
+    body { min-height: 100vh; }
+
+    .page {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 56px 64px 96px;
+      position: relative;
+    }
+    .page::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--bp-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .page::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--bp-grid-strong) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bp-grid-strong) 1px, transparent 1px);
+      background-size: 120px 120px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .page > * { position: relative; z-index: 1; }
+
+    /* Header */
+    .doc-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: end;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--bp-line);
+      margin-bottom: 48px;
+    }
+    .doc-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--bp-cyan);
+      display: flex;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .doc-eyebrow .sep { color: var(--bp-line); }
+    .doc-eyebrow .dim { color: var(--bp-ink-3); }
+    .doc-title {
+      font-family: var(--font-display);
+      font-size: 44px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+      margin: 0;
+    }
+    .doc-title em { font-style: normal; color: var(--bp-cyan); }
+    .doc-subtitle {
+      margin-top: 14px;
+      color: var(--bp-ink-2);
+      font-size: 15px;
+      max-width: 780px;
+      line-height: 1.5;
+    }
+    .doc-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--bp-ink-3);
+      text-align: right;
+      line-height: 1.7;
+    }
+    .doc-meta strong { color: var(--bp-ink); font-weight: 600; }
+
+    /* Section */
+    section { margin-bottom: 64px; }
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed var(--bp-line);
+    }
+    .sec-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--bp-cyan);
+      border: 1px solid var(--bp-cyan);
+      padding: 4px 8px;
+      background: rgba(94, 224, 255, 0.08);
+    }
+    .sec-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.005em;
+      margin: 0;
+    }
+    .sec-tag {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--bp-ink-3);
+    }
+    .sec-sub {
+      color: var(--bp-ink-2);
+      font-size: 13.5px;
+      line-height: 1.55;
+      max-width: 860px;
+      margin: -8px 0 28px;
+    }
+
+    /* === Section 1: KPI strip === */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0;
+      border: 1px solid var(--bp-line);
+      background: linear-gradient(180deg, rgba(20,40,70,0.5), rgba(10,25,50,0.4));
+    }
+    .kpi {
+      padding: 18px 18px 20px;
+      border-right: 1px solid var(--bp-line);
+      position: relative;
+    }
+    .kpi:last-child { border-right: none; }
+    .kpi-label {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--bp-ink-3);
+      margin-bottom: 12px;
+    }
+    .kpi-val {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--bp-ink);
+      line-height: 1.05;
+    }
+    .kpi-val .unit { font-family: var(--font-mono); font-size: 11px; color: var(--bp-ink-3); margin-left: 4px; font-weight: 400; }
+    .kpi-sub {
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--bp-ink-2);
+    }
+    .kpi.alert .kpi-val { color: var(--bp-red); }
+    .kpi.warn .kpi-val { color: var(--bp-amber); }
+    .kpi.ok .kpi-val { color: var(--bp-green); }
+
+    /* === Diagnostic grid (Section 2) === */
+    .diag {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    .pain-list { display: grid; gap: 12px; }
+    .pain {
+      border: 1px solid var(--bp-line);
+      padding: 16px 18px;
+      background: rgba(10, 25, 50, 0.5);
+      position: relative;
+    }
+    .pain .num {
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      padding: 3px 7px;
+      background: var(--bp-paper-2);
+      border: 1px solid var(--bp-line);
+      border-top: none;
+      border-left: none;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--bp-amber);
+    }
+    .pain .pain-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      margin: 14px 0 4px;
+    }
+    .pain .pain-body { color: var(--bp-ink-2); font-size: 12.5px; line-height: 1.5; }
+    .pain .pain-evid {
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--bp-cyan);
+      letter-spacing: 0.04em;
+    }
+
+    /* tabs-as-fan diagram */
+    .fan-diagram {
+      border: 1px solid var(--bp-line);
+      padding: 20px;
+      background: rgba(10, 25, 50, 0.4);
+      min-height: 480px;
+    }
+    .fan-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--bp-ink-3);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* === Big architecture diagram === */
+    .arch {
+      border: 1px solid var(--bp-line);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(94, 224, 255, 0.04), transparent 50%),
+        linear-gradient(180deg, rgba(20,40,70,0.5), rgba(10,25,50,0.3));
+      padding: 40px 36px;
+      position: relative;
+    }
+    .arch-frame { position: absolute; pointer-events: none; }
+    .arch-frame.tl { top: 8px; left: 8px; border-top: 1px solid var(--bp-cyan); border-left: 1px solid var(--bp-cyan); width: 28px; height: 28px; }
+    .arch-frame.tr { top: 8px; right: 8px; border-top: 1px solid var(--bp-cyan); border-right: 1px solid var(--bp-cyan); width: 28px; height: 28px; }
+    .arch-frame.bl { bottom: 8px; left: 8px; border-bottom: 1px solid var(--bp-cyan); border-left: 1px solid var(--bp-cyan); width: 28px; height: 28px; }
+    .arch-frame.br { bottom: 8px; right: 8px; border-bottom: 1px solid var(--bp-cyan); border-right: 1px solid var(--bp-cyan); width: 28px; height: 28px; }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 180px 1fr 220px;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .layer-label {
+      border: 1px solid var(--bp-line);
+      background: var(--bp-paper);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+    .layer-label::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -24px;
+      width: 24px;
+      height: 1px;
+      background: var(--bp-line-strong);
+    }
+    .layer-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--bp-ink-3);
+    }
+    .layer-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 16px;
+      margin-top: 4px;
+      letter-spacing: -0.005em;
+    }
+    .layer-name.crit { color: var(--bp-cyan); }
+    .layer-name.ops { color: var(--bp-ink); }
+    .layer-name.deep { color: var(--bp-amber); }
+    .layer-name.audit { color: var(--bp-violet); }
+    .layer-pers {
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--bp-ink-3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .layer-pers span { display: block; margin-bottom: 3px; }
+
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .module {
+      border: 1px solid var(--bp-line);
+      background: linear-gradient(180deg, rgba(30, 50, 80, 0.5), rgba(15, 30, 55, 0.5));
+      padding: 14px 12px 12px;
+      position: relative;
+      min-height: 112px;
+    }
+    .module.crit { border-color: rgba(94, 224, 255, 0.6); background: linear-gradient(180deg, rgba(94, 224, 255, 0.1), rgba(15, 30, 55, 0.5)); }
+    .module.audit { border-color: rgba(180, 140, 255, 0.45); background: linear-gradient(180deg, rgba(180, 140, 255, 0.08), rgba(15, 30, 55, 0.5)); }
+    .mod-corner { position: absolute; top: 0; right: 0; padding: 2px 5px; font-family: var(--font-mono); font-size: 8.5px; color: var(--bp-ink-4); border-left: 1px solid var(--bp-line); border-bottom: 1px solid var(--bp-line); background: var(--bp-paper); letter-spacing: 0.1em; }
+    .mod-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12.5px;
+      letter-spacing: -0.005em;
+      margin-bottom: 4px;
+    }
+    .mod-desc {
+      font-size: 10.5px;
+      color: var(--bp-ink-2);
+      line-height: 1.4;
+    }
+    .mod-from {
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--bp-ink-3);
+      letter-spacing: 0.06em;
+      padding-top: 6px;
+      border-top: 1px dashed var(--bp-line);
+    }
+
+    .layer-output {
+      border: 1px dashed var(--bp-line);
+      padding: 14px;
+      background: rgba(10, 25, 50, 0.3);
+      position: relative;
+    }
+    .layer-output::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -24px;
+      width: 24px;
+      height: 1px;
+      background: var(--bp-line-strong);
+    }
+    .layer-output .out-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      color: var(--bp-ink-3);
+      text-transform: uppercase;
+    }
+    .layer-output .out-val {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 13px;
+      margin-top: 6px;
+      color: var(--bp-cyan);
+      line-height: 1.35;
+    }
+
+    /* axes (filters bar) */
+    .axes-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 24px;
+      padding: 14px 0;
+      margin-top: 24px;
+      border-top: 1px solid var(--bp-line);
+    }
+    .axes-row .axes-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--bp-amber);
+      text-transform: uppercase;
+      padding-top: 8px;
+    }
+    .axes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .axis {
+      border: 1px solid var(--bp-amber-dim);
+      background: rgba(255, 180, 84, 0.05);
+      padding: 10px 12px;
+    }
+    .axis-name {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--bp-amber);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .axis-vals { font-size: 11px; color: var(--bp-ink-2); margin-top: 6px; line-height: 1.4; }
+
+    /* === Mapping table === */
+    .map-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: var(--font-sans);
+      border: 1px solid var(--bp-line);
+    }
+    .map-table th {
+      text-align: left;
+      padding: 12px 14px;
+      background: var(--bp-paper);
+      border-bottom: 1px solid var(--bp-line);
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      color: var(--bp-ink-3);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .map-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(42, 74, 122, 0.4);
+      color: var(--bp-ink-2);
+      vertical-align: top;
+    }
+    .map-table tr:hover td { background: rgba(94, 224, 255, 0.04); }
+    .map-table td.aba { font-family: var(--font-mono); color: var(--bp-ink); font-size: 11.5px; }
+    .map-table td.act {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .act.keep { color: var(--bp-green); }
+    .act.merge { color: var(--bp-amber); }
+    .act.elevate { color: var(--bp-cyan); }
+    .act.demote { color: var(--bp-ink-3); }
+    .act.kill { color: var(--bp-red); }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .pill.l0 { border-color: var(--bp-cyan); color: var(--bp-cyan); background: rgba(94,224,255,0.08); }
+    .pill.l1 { border-color: var(--bp-ink-2); color: var(--bp-ink-2); }
+    .pill.l2 { border-color: var(--bp-amber); color: var(--bp-amber); background: rgba(255,180,84,0.06); }
+    .pill.l3 { border-color: var(--bp-ink-3); color: var(--bp-ink-3); }
+    .pill.l4 { border-color: var(--bp-violet); color: var(--bp-violet); background: rgba(180,140,255,0.06); }
+    .pill.dim { border-color: var(--bp-line); color: var(--bp-ink-4); }
+
+    /* === Reading sequence === */
+    .reading {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--bp-line);
+    }
+    .read-col {
+      padding: 22px 22px 24px;
+      border-right: 1px solid var(--bp-line);
+      position: relative;
+      background: linear-gradient(180deg, rgba(20,40,70,0.4), rgba(10,25,50,0.3));
+    }
+    .read-col:last-child { border-right: none; }
+    .read-col::before {
+      content: "→";
+      position: absolute;
+      right: -10px;
+      top: 26px;
+      font-family: var(--font-mono);
+      color: var(--bp-cyan);
+      font-size: 18px;
+      z-index: 2;
+      background: var(--bp-void);
+      padding: 0 2px;
+    }
+    .read-col:last-child::before { display: none; }
+    .read-time {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--bp-amber);
+    }
+    .read-who {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--bp-ink-3);
+      margin-top: 4px;
+    }
+    .read-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 17px;
+      margin-top: 14px;
+      letter-spacing: -0.005em;
+    }
+    .read-body {
+      color: var(--bp-ink-2);
+      font-size: 12.5px;
+      line-height: 1.55;
+      margin-top: 10px;
+    }
+    .read-list { margin: 14px 0 0; padding: 0; list-style: none; }
+    .read-list li {
+      padding: 6px 0 6px 16px;
+      position: relative;
+      font-size: 12px;
+      color: var(--bp-ink-2);
+      border-bottom: 1px dashed rgba(42, 74, 122, 0.4);
+    }
+    .read-list li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--bp-cyan);
+      font-size: 10px;
+      top: 7px;
+    }
+    .read-list li:last-child { border-bottom: none; }
+
+    /* footer */
+    .doc-foot {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--bp-line);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 32px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--bp-ink-3);
+    }
+    .doc-foot strong { color: var(--bp-ink); font-weight: 600; display: block; margin-bottom: 6px; letter-spacing: 0.16em; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- HEADER -->
+    <header class="doc-head">
+      <div>
+        <div class="doc-eyebrow">
+          <span>DOC · IA-01</span>
+          <span class="sep">/</span>
+          <span class="dim">Information Architecture Proposal</span>
+          <span class="sep">/</span>
+          <span class="dim">v1 · draft</span>
+        </div>
+        <h1 class="doc-title">Dashboard Gerencial Financeiro<br/><em>REUNIDOS · DESCART</em></h1>
+        <div class="doc-subtitle">
+          Proposta de organização para consolidar as 29 abas do workbook v6 num painel navegável em 4 camadas — do executivo
+          de 90 segundos ao drill-down de auditoria. Baseado em diagnóstico do conteúdo atual e nos 5 achados críticos de 29 meses.
+        </div>
+      </div>
+      <div class="doc-meta">
+        Fonte: Dashboard_LRA_v6_FINAL.xlsx<br/>
+        <strong>29 abas · 29 meses</strong><br/>
+        Janela: jan/2024 — mai/2026<br/>
+        2 empresas · 1 holding<br/>
+        SGC + SGC2 · 97 clifor · 13 fab.
+      </div>
+    </header>
+
+    <!-- SECTION 0 — KPIs that anchor everything -->
+    <section>
+      <div class="sec-head">
+        <span class="sec-num">00</span>
+        <h2 class="sec-title">Âncoras da operação · 29 meses</h2>
+        <span class="sec-tag">Base · valores consolidados</span>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">CAR Reunidos</div>
+          <div class="kpi-val">253,9<span class="unit">M&nbsp;BRL</span></div>
+          <div class="kpi-sub">Top 100 clientes</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">CAP Reunidos</div>
+          <div class="kpi-val">372,9<span class="unit">M&nbsp;BRL</span></div>
+          <div class="kpi-sub">Top 100 fornec.</div>
+        </div>
+        <div class="kpi ok">
+          <div class="kpi-label">Result. Bruto REUN.</div>
+          <div class="kpi-val">155,4<span class="unit">M&nbsp;BRL</span></div>
+          <div class="kpi-sub">CAR – Desp. operac.</div>
+        </div>
+        <div class="kpi alert">
+          <div class="kpi-label">Concentração SUSAM</div>
+          <div class="kpi-val">87,6<span class="unit">%</span></div>
+          <div class="kpi-sub">Cliente único · CRÍTICO</div>
+        </div>
+        <div class="kpi warn">
+          <div class="kpi-label">Gap intercompany</div>
+          <div class="kpi-val">16,6<span class="unit">M&nbsp;BRL</span></div>
+          <div class="kpi-sub">44% não reconhec.</div>
+        </div>
+        <div class="kpi warn">
+          <div class="kpi-label">Desp. financeira</div>
+          <div class="kpi-val">53,2<span class="unit">M&nbsp;BRL</span></div>
+          <div class="kpi-sub">22% do resultado</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1 — Diagnostic -->
+    <section>
+      <div class="sec-head">
+        <span class="sec-num">01</span>
+        <h2 class="sec-title">Diagnóstico · o que o workbook faz hoje</h2>
+        <span class="sec-tag">Antes da reorganização</span>
+      </div>
+      <p class="sec-sub">
+        29 abas numa lista plana, misturando 4 naturezas distintas (síntese, operacional mensal, dimensões/cadastros e análises temáticas).
+        Os achados críticos ficam diluídos no final do arquivo (aba 29). A informação está toda lá — falta hierarquia de leitura.
+      </p>
+
+      <div class="diag">
+        <div class="pain-list">
+          <div class="pain">
+            <span class="num">P01</span>
+            <div class="pain-title">Ponto de entrada confuso</div>
+            <div class="pain-body">
+              Existem 3 "abas de topo" — Sumário (#1), Dashboard Executivo (#21) e Achados Finais (#29) — espalhadas pelas pontas.
+              O leitor não sabe por onde começar.
+            </div>
+            <div class="pain-evid">→ Unificar numa Camada 0 com 1 tela única.</div>
+          </div>
+          <div class="pain">
+            <span class="num">P02</span>
+            <div class="pain-title">CAP/CAR repetido 9 vezes</div>
+            <div class="pain-body">
+              Abas 16–20 e 22–25 cobrem CAP/CAR mensal por empresa × top 30/top 100. É o mesmo dado fatiado.
+              Empilhar como filtros (empresa, profundidade) economiza 80% do espaço.
+            </div>
+            <div class="pain-evid">→ 9 abas → 1 módulo com 2 toggles.</div>
+          </div>
+          <div class="pain">
+            <span class="num">P03</span>
+            <div class="pain-title">Achados críticos escondidos</div>
+            <div class="pain-body">
+              SUSAM 87,6%, gap intercompany R$ 16,6M e remuneração ao controle R$ 12,8M são os 3 vetores de decisão da diretoria,
+              mas só aparecem na aba 29.
+            </div>
+            <div class="pain-evid">→ Promover para Camada 0 como alertas permanentes.</div>
+          </div>
+          <div class="pain">
+            <span class="num">P04</span>
+            <div class="pain-title">Anomalias × Achados duplicam-se</div>
+            <div class="pain-body">
+              Aba 15 (Anomalias) e aba 29 (Achados) cobrem temas sobrepostos com numeração diferente. Confunde rastreamento de ações.
+            </div>
+            <div class="pain-evid">→ Mesclar em "Governança & Achados" (Camada 4).</div>
+          </div>
+          <div class="pain">
+            <span class="num">P05</span>
+            <div class="pain-title">Dimensões tratadas como relatório</div>
+            <div class="pain-body">
+              Mapa Clifor (#6), Hierarquia Plano (#7) e Fabricantes×Produtos (#4) são chaves de junção,
+              não relatórios para leitura sequencial.
+            </div>
+            <div class="pain-evid">→ Mover para painel lateral de "Dimensões" sempre acessível.</div>
+          </div>
+        </div>
+
+        <div class="fan-diagram">
+          <div class="fan-title">29 abas · distribuição atual por natureza</div>
+          <svg viewBox="0 0 520 480" style="width:100%; height:auto;">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
+              </marker>
+            </defs>
+            <!-- center circle -->
+            <circle cx="260" cy="240" r="64" fill="rgba(94,224,255,0.06)" stroke="var(--bp-line-strong)" stroke-width="1" />
+            <text x="260" y="232" text-anchor="middle" font-family="var(--font-display)" font-size="14" font-weight="600" fill="var(--bp-cyan)">29 abas</text>
+            <text x="260" y="252" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" letter-spacing="0.14em" fill="var(--bp-ink-3)">FLAT LIST</text>
+
+            <!-- 4 cluster rings -->
+            <!-- Cluster A — Síntese -->
+            <g transform="translate(120, 90)">
+              <rect x="-58" y="-26" width="116" height="52" fill="rgba(94,224,255,0.05)" stroke="var(--bp-cyan)" stroke-width="0.8"/>
+              <text x="0" y="-8" text-anchor="middle" font-family="var(--font-mono)" font-size="9" letter-spacing="0.14em" fill="var(--bp-cyan)">SÍNTESE · 3</text>
+              <text x="0" y="6" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--bp-ink-2)">#1 · #21 · #29</text>
+              <text x="0" y="18" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--bp-ink-4)">nas 3 pontas</text>
+            </g>
+            <line x1="170" y1="116" x2="220" y2="200" stroke="var(--bp-cyan)" stroke-width="0.8" stroke-dasharray="3 3"/>
+
+            <!-- Cluster B — Operacional mensal -->
+            <g transform="translate(400, 90)">
+              <rect x="-66" y="-26" width="132" height="52" fill="rgba(255,180,84,0.05)" stroke="var(--bp-amber)" stroke-width="0.8"/>
+              <text x="0" y="-8" text-anchor="middle" font-family="var(--font-mono)" font-size="9" letter-spacing="0.14em" fill="var(--bp-amber)">CAP/CAR MENSAL · 9</text>
+              <text x="0" y="6" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--bp-ink-2)">#16–20 · #22–25</text>
+              <text x="0" y="18" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--bp-ink-4)">repete dimensão</text>
+            </g>
+            <line x1="350" y1="116" x2="300" y2="200" stroke="var(--bp-amber)" stroke-width="0.8" stroke-dasharray="3 3"/>
+
+            <!-- Cluster C — Análises temáticas -->
+            <g transform="translate(120, 390)">
+              <rect x="-72" y="-26" width="144" height="52" fill="rgba(95,220,146,0.04)" stroke="var(--bp-green)" stroke-width="0.8"/>
+              <text x="0" y="-8" text-anchor="middle" font-family="var(--font-mono)" font-size="9" letter-spacing="0.14em" fill="var(--bp-green)">TEMÁTICAS · 13</text>
+              <text x="0" y="6" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--bp-ink-2)">#2,3,5,10–15</text>
+              <text x="0" y="18" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--bp-ink-4)">mini-relatórios soltos</text>
+            </g>
+            <line x1="170" y1="364" x2="220" y2="280" stroke="var(--bp-green)" stroke-width="0.8" stroke-dasharray="3 3"/>
+
+            <!-- Cluster D — Dimensões -->
+            <g transform="translate(400, 390)">
+              <rect x="-66" y="-26" width="132" height="52" fill="rgba(180,140,255,0.05)" stroke="var(--bp-violet)" stroke-width="0.8"/>
+              <text x="0" y="-8" text-anchor="middle" font-family="var(--font-mono)" font-size="9" letter-spacing="0.14em" fill="var(--bp-violet)">DIMENSÕES · 4</text>
+              <text x="0" y="6" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--bp-ink-2)">#4 · #6 · #7 · #28</text>
+              <text x="0" y="18" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--bp-ink-4)">cadastros, não relatórios</text>
+            </g>
+            <line x1="350" y1="364" x2="300" y2="280" stroke="var(--bp-violet)" stroke-width="0.8" stroke-dasharray="3 3"/>
+
+            <!-- Crosshair markers -->
+            <g transform="translate(260, 240)">
+              <line x1="-100" x2="100" y1="0" y2="0" stroke="var(--bp-line)" stroke-width="0.4" stroke-dasharray="1 4"/>
+              <line x1="0" x2="0" y1="-90" y2="90" stroke="var(--bp-line)" stroke-width="0.4" stroke-dasharray="1 4"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2 — proposed architecture -->
+    <section>
+      <div class="sec-head">
+        <span class="sec-num">02</span>
+        <h2 class="sec-title">Arquitetura proposta · 4 camadas + 2 eixos</h2>
+        <span class="sec-tag">Recomendação principal</span>
+      </div>
+      <p class="sec-sub">
+        Hierarquia <strong style="color:var(--bp-cyan)">L0 → L4</strong> do executivo para a auditoria. Cada camada tem uma promessa de tempo, um perfil de leitor e um entregável claro.
+        Os dois eixos (empresa, tempo) são filtros globais — não viram abas.
+      </p>
+
+      <div class="arch">
+        <div class="arch-frame tl"></div>
+        <div class="arch-frame tr"></div>
+        <div class="arch-frame bl"></div>
+        <div class="arch-frame br"></div>
+
+        <!-- LAYER 0 -->
+        <div class="layer">
+          <div class="layer-label">
+            <div class="layer-num">L0 · TOPO</div>
+            <div class="layer-name crit">Síntese Executiva</div>
+            <div class="layer-pers">
+              <span>Diretoria</span>
+              <span>90&nbsp;segundos</span>
+            </div>
+          </div>
+          <div class="modules">
+            <div class="module crit">
+              <div class="mod-corner">M0.1</div>
+              <div class="mod-title">Pulso financeiro</div>
+              <div class="mod-desc">6 KPIs âncora: CAR/CAP/Resultado por empresa + 3 alertas globais.</div>
+              <div class="mod-from">DE: #1 · #21</div>
+            </div>
+            <div class="module crit">
+              <div class="mod-corner">M0.2</div>
+              <div class="mod-title">3 alertas críticos</div>
+              <div class="mod-desc">Concentração SUSAM · Gap intercompany · Despesa financeira. Cores permanentes.</div>
+              <div class="mod-from">DE: #29 (promovido)</div>
+            </div>
+            <div class="module crit">
+              <div class="mod-corner">M0.3</div>
+              <div class="mod-title">Curva 29 meses</div>
+              <div class="mod-desc">Linha CAR vs CAP vs Resultado — uma única figura central.</div>
+              <div class="mod-from">DE: #18 #19 #10</div>
+            </div>
+            <div class="module crit">
+              <div class="mod-corner">M0.4</div>
+              <div class="mod-title">Resumo p/ diretoria</div>
+              <div class="mod-desc">5 frases prontas para reunião. Atualiza-se mensalmente.</div>
+              <div class="mod-from">DE: #29 (resumo)</div>
+            </div>
+          </div>
+          <div class="layer-output">
+            <div class="out-label">Entrega</div>
+            <div class="out-val">Tela única<br/>"vai/não vai" em 90s</div>
+          </div>
+        </div>
+
+        <!-- LAYER 1 -->
+        <div class="layer">
+          <div class="layer-label">
+            <div class="layer-num">L1 · OPERAÇÃO</div>
+            <div class="layer-name ops">Performance por Empresa</div>
+            <div class="layer-pers">
+              <span>Controller · CFO</span>
+              <span>5&nbsp;minutos</span>
+            </div>
+          </div>
+          <div class="modules">
+            <div class="module">
+              <div class="mod-corner">M1.1</div>
+              <div class="mod-title">P&L mensal</div>
+              <div class="mod-desc">CAR – CAP – Despesa 4xx → Resultado bruto. Toggle REUN/DESCART.</div>
+              <div class="mod-from">DE: #16–20 (4 abas → 1)</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M1.2</div>
+              <div class="mod-title">Sazonalidade</div>
+              <div class="mod-desc">Pedidos · margem · ticket médio mês a mês. Detecta picos anômalos.</div>
+              <div class="mod-from">DE: #10 · #15(#4)</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M1.3</div>
+              <div class="mod-title">Curva ABC produtos</div>
+              <div class="mod-desc">51 SKUs = 80% da venda · 320 SKUs de cauda longa para revisão.</div>
+              <div class="mod-from">DE: #11 · #15(#8)</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M1.4</div>
+              <div class="mod-title">Consumo por unidade</div>
+              <div class="mod-desc">Hospitais externos × intercompany. Mapeamento 67% — aceitar com asterisco.</div>
+              <div class="mod-from">DE: #12 · #14</div>
+            </div>
+          </div>
+          <div class="layer-output">
+            <div class="out-label">Entrega</div>
+            <div class="out-val">Como cada empresa<br/>se comporta no tempo</div>
+          </div>
+        </div>
+
+        <!-- LAYER 2 -->
+        <div class="layer">
+          <div class="layer-label">
+            <div class="layer-num">L2 · ANÁLISES</div>
+            <div class="layer-name deep">Vetores Estratégicos</div>
+            <div class="layer-pers">
+              <span>CFO · Sócios</span>
+              <span>15&nbsp;minutos</span>
+            </div>
+          </div>
+          <div class="modules">
+            <div class="module">
+              <div class="mod-corner">M2.1</div>
+              <div class="mod-title">Concentração de receita</div>
+              <div class="mod-desc">Top 5 clientes REUN · SUSAM 87,6%. Cenários de "perda do contrato".</div>
+              <div class="mod-from">DE: #21(seção)</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M2.2</div>
+              <div class="mod-title">Reconciliação Intercompany</div>
+              <div class="mod-desc">REUN paga 133 × DESCART recebe 46. Gap mensal + status.</div>
+              <div class="mod-from">DE: #5 · #20</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M2.3</div>
+              <div class="mod-title">Remuneração ao controle</div>
+              <div class="mod-desc">GESTA + sócios diretos × conta 401010021. R$ 12,8M em 29m.</div>
+              <div class="mod-from">DE: #21(seção)</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M2.4</div>
+              <div class="mod-title">Custo financeiro</div>
+              <div class="mod-desc">Bradesco emp. + PERT + B.B. Giro. Drena 22% do resultado.</div>
+              <div class="mod-from">DE: #29 (achado 3)</div>
+            </div>
+          </div>
+          <div class="layer-output">
+            <div class="out-label">Entrega</div>
+            <div class="out-val">Onde está<br/>o risco real</div>
+          </div>
+        </div>
+
+        <!-- LAYER 3 -->
+        <div class="layer">
+          <div class="layer-label">
+            <div class="layer-num">L3 · DRILL-DOWN</div>
+            <div class="layer-name ops">Detalhe Mensal</div>
+            <div class="layer-pers">
+              <span>Analista</span>
+              <span>navegação livre</span>
+            </div>
+          </div>
+          <div class="modules">
+            <div class="module">
+              <div class="mod-corner">M3.1</div>
+              <div class="mod-title">CAP detalhado</div>
+              <div class="mod-desc">Top 100 fornec. × 29 meses. Heatmap + busca por clifor.</div>
+              <div class="mod-from">DE: #16 #17 #23 #25</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M3.2</div>
+              <div class="mod-title">CAR detalhado</div>
+              <div class="mod-desc">Top 100 clientes × 29 meses. Idem CAP.</div>
+              <div class="mod-from">DE: #18 #19 #22 #24</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M3.3</div>
+              <div class="mod-title">Despesas conta 4xx</div>
+              <div class="mod-desc">Pivot mensal por conta contábil — REUN e DESCART.</div>
+              <div class="mod-from">DE: #26 · #27</div>
+            </div>
+            <div class="module">
+              <div class="mod-corner">M3.4</div>
+              <div class="mod-title">Contratos de locação</div>
+              <div class="mod-desc">90 contratos · vigência · valor mensal · status. Alerta &lt;60d.</div>
+              <div class="mod-from">DE: #2 · #3 · #13</div>
+            </div>
+          </div>
+          <div class="layer-output">
+            <div class="out-label">Entrega</div>
+            <div class="out-val">Resposta a "por que"<br/>de qualquer KPI</div>
+          </div>
+        </div>
+
+        <!-- LAYER 4 -->
+        <div class="layer">
+          <div class="layer-label">
+            <div class="layer-num">L4 · GOVERNANÇA</div>
+            <div class="layer-name audit">Auditoria & Achados</div>
+            <div class="layer-pers">
+              <span>Auditoria · Cont.</span>
+              <span>workflow contínuo</span>
+            </div>
+          </div>
+          <div class="modules">
+            <div class="module audit">
+              <div class="mod-corner">M4.1</div>
+              <div class="mod-title">Achados consolidados</div>
+              <div class="mod-desc">14 achados (CRÍT/ALTO/MÉDIO/BAIXO) com ação recomendada e responsável.</div>
+              <div class="mod-from">DE: #15 + #29 (merge)</div>
+            </div>
+            <div class="module audit">
+              <div class="mod-corner">M4.2</div>
+              <div class="mod-title">Queries pendentes</div>
+              <div class="mod-desc">Q1–Q4 abertas para fechamento de períodos. Status workflow.</div>
+              <div class="mod-from">DE: #8 · #9</div>
+            </div>
+            <div class="module audit">
+              <div class="mod-corner">M4.3</div>
+              <div class="mod-title">Anomalias técnicas</div>
+              <div class="mod-desc">Cadastros duplicados, datas inválidas, PROSSERV como cliente, margens negativas.</div>
+              <div class="mod-from">DE: #15</div>
+            </div>
+            <div class="module audit">
+              <div class="mod-corner">M4.4</div>
+              <div class="mod-title">Dimensões / cadastros</div>
+              <div class="mod-desc">Clifor, plano contábil, fabricantes, histórico top 200. Read-only, indexado.</div>
+              <div class="mod-from">DE: #4 #6 #7 #28</div>
+            </div>
+          </div>
+          <div class="layer-output">
+            <div class="out-label">Entrega</div>
+            <div class="out-val">Trilha de auditoria<br/>+ pendências abertas</div>
+          </div>
+        </div>
+
+        <!-- AXES -->
+        <div class="axes-row">
+          <div class="axes-label">⊕ Eixos transversais</div>
+          <div class="axes">
+            <div class="axis">
+              <div class="axis-name">E1 · Empresa</div>
+              <div class="axis-vals">REUNIDOS · DESCART · Consolidado (incluir/excluir intercompany)</div>
+            </div>
+            <div class="axis">
+              <div class="axis-name">E2 · Tempo</div>
+              <div class="axis-vals">Mês · Trimestre · YTD · 29m total · janela móvel</div>
+            </div>
+            <div class="axis">
+              <div class="axis-name">E3 · Profundidade</div>
+              <div class="axis-vals">Top 30 · Top 100 · todos (na L3 apenas)</div>
+            </div>
+            <div class="axis">
+              <div class="axis-name">E4 · Cenário</div>
+              <div class="axis-vals">Real · "sem SUSAM" · "com intercompany conciliado"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3 — Mapping -->
+    <section>
+      <div class="sec-head">
+        <span class="sec-num">03</span>
+        <h2 class="sec-title">Mapping · cada aba do XLSX para onde vai</h2>
+        <span class="sec-tag">29 abas → 18 módulos</span>
+      </div>
+      <p class="sec-sub">
+        Coluna <strong>ação</strong>: <span class="act keep">KEEP</span> mantém como módulo · <span class="act merge">MERGE</span> funde com outra · <span class="act elevate">ELEVATE</span> sobe para L0 ·
+        <span class="act demote">DEMOTE</span> vira filtro/cadastro · <span class="act kill">KILL</span> remove (redundante).
+      </p>
+
+      <table class="map-table">
+        <thead>
+          <tr>
+            <th style="width:48px">#</th>
+            <th>Aba original</th>
+            <th>Natureza</th>
+            <th>Vai para</th>
+            <th>Módulo</th>
+            <th>Ação</th>
+            <th>Observação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="aba">01</td><td class="aba">1. Sumário</td><td>Síntese</td><td><span class="pill l0">L0</span></td><td>M0.1 / M0.4</td><td class="act merge">MERGE</td><td>Funde com Dashboard Executivo. Vira tela única.</td></tr>
+          <tr><td class="aba">02</td><td class="aba">2. Locação por Setor</td><td>Temática</td><td><span class="pill l3">L3</span></td><td>M3.4</td><td class="act keep">KEEP</td><td>Vira drill-down dentro de "Contratos".</td></tr>
+          <tr><td class="aba">03</td><td class="aba">3. Locação por Fornecedor</td><td>Temática</td><td><span class="pill l3">L3</span></td><td>M3.4</td><td class="act merge">MERGE</td><td>Mesma fonte da #2, só muda agrupamento → toggle.</td></tr>
+          <tr><td class="aba">04</td><td class="aba">4. Fabricantes × Produtos</td><td>Dimensão</td><td><span class="pill l4">L4</span></td><td>M4.4</td><td class="act demote">DEMOTE</td><td>Cadastro de apoio, não relatório.</td></tr>
+          <tr><td class="aba">05</td><td class="aba">5. Intercompany Mensal</td><td>Análise</td><td><span class="pill l2">L2</span></td><td>M2.2</td><td class="act elevate">ELEVATE</td><td>Sobe — é vetor estratégico (gap R$ 16,6M).</td></tr>
+          <tr><td class="aba">06</td><td class="aba">6. Mapa Clifor</td><td>Dimensão</td><td><span class="pill l4">L4</span></td><td>M4.4</td><td class="act demote">DEMOTE</td><td>Chave de junção. Vira índice consultável.</td></tr>
+          <tr><td class="aba">07</td><td class="aba">7. Hierarquia Plano</td><td>Dimensão</td><td><span class="pill l4">L4</span></td><td>M4.4</td><td class="act demote">DEMOTE</td><td>Idem. Ajuda a entender contas 4xx.</td></tr>
+          <tr><td class="aba">08</td><td class="aba">8. Queries Pendentes</td><td>Governança</td><td><span class="pill l4">L4</span></td><td>M4.2</td><td class="act keep">KEEP</td><td>Tabela viva de pendências.</td></tr>
+          <tr><td class="aba">09</td><td class="aba">9. Roadmap</td><td>Governança</td><td><span class="pill l4">L4</span></td><td>M4.2</td><td class="act merge">MERGE</td><td>Funde com Queries (mesmo workflow).</td></tr>
+          <tr><td class="aba">10</td><td class="aba">10. Sazonalidade Mensal</td><td>Temática</td><td><span class="pill l1">L1</span></td><td>M1.2</td><td class="act keep">KEEP</td><td>Coração da L1 — leitura mensal natural.</td></tr>
+          <tr><td class="aba">11</td><td class="aba">11. Curva ABC Produtos</td><td>Temática</td><td><span class="pill l1">L1</span></td><td>M1.3</td><td class="act keep">KEEP</td><td>Decisão de catálogo (descontinuar 320 SKUs).</td></tr>
+          <tr><td class="aba">12</td><td class="aba">12. Hospitais Externos</td><td>Temática</td><td><span class="pill l1">L1</span></td><td>M1.4</td><td class="act keep">KEEP</td><td>Junto com Consumo por Unidade.</td></tr>
+          <tr><td class="aba">13</td><td class="aba">13. Vigência Contratos</td><td>Temática</td><td><span class="pill l3">L3</span></td><td>M3.4</td><td class="act merge">MERGE</td><td>Funde com #2 #3 — uma só visão de contratos.</td></tr>
+          <tr><td class="aba">14</td><td class="aba">14. Consumo por Unidade</td><td>Temática</td><td><span class="pill l1">L1</span></td><td>M1.4</td><td class="act keep">KEEP</td><td>Aceitar cobertura 67% com asterisco.</td></tr>
+          <tr><td class="aba">15</td><td class="aba">15. Anomalias</td><td>Governança</td><td><span class="pill l4">L4</span></td><td>M4.1 + M4.3</td><td class="act merge">MERGE</td><td>Funde com Achados Finais (#29). Tipar por severidade.</td></tr>
+          <tr><td class="aba">16</td><td class="aba">16. CAP Mensal REUNIDOS</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.1</td><td class="act merge">MERGE</td><td>4 abas CAP viram 1 módulo com toggles emp/profund.</td></tr>
+          <tr><td class="aba">17</td><td class="aba">17. CAP Mensal DESCART</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.1</td><td class="act merge">MERGE</td><td>Idem.</td></tr>
+          <tr><td class="aba">18</td><td class="aba">18. CAR Mensal REUNIDOS</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.2</td><td class="act merge">MERGE</td><td>4 abas CAR viram 1 módulo.</td></tr>
+          <tr><td class="aba">19</td><td class="aba">19. CAR Mensal DESCART</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.2</td><td class="act merge">MERGE</td><td>Idem.</td></tr>
+          <tr><td class="aba">20</td><td class="aba">20. Reconciliação Intercompany</td><td>Análise</td><td><span class="pill l2">L2</span></td><td>M2.2</td><td class="act elevate">ELEVATE</td><td>Sobe para L2 com #5.</td></tr>
+          <tr><td class="aba">21</td><td class="aba">21. Dashboard Executivo</td><td>Síntese</td><td><span class="pill l0">L0</span></td><td>M0.1–M0.4</td><td class="act elevate">ELEVATE</td><td>Vira a Camada 0 inteira. Quebrada em 4 módulos.</td></tr>
+          <tr><td class="aba">22</td><td class="aba">22. CAR Mensal REUN 100</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.2</td><td class="act merge">MERGE</td><td>Profundidade Top 100 — vira toggle.</td></tr>
+          <tr><td class="aba">23</td><td class="aba">23. CAP Mensal REUN 100</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.1</td><td class="act merge">MERGE</td><td>Idem.</td></tr>
+          <tr><td class="aba">24</td><td class="aba">24. CAR Mensal DESCART</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.2</td><td class="act merge">MERGE</td><td>Idem.</td></tr>
+          <tr><td class="aba">25</td><td class="aba">25. CAP Mensal DESCART 100</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.1</td><td class="act merge">MERGE</td><td>Idem.</td></tr>
+          <tr><td class="aba">26</td><td class="aba">26. Despesas Det REUNIDOS</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.3</td><td class="act keep">KEEP</td><td>Pivot por conta 4xx. Conecta com L2.4 (financeiro).</td></tr>
+          <tr><td class="aba">27</td><td class="aba">27. Despesas Det DESCART</td><td>Operacional</td><td><span class="pill l3">L3</span></td><td>M3.3</td><td class="act merge">MERGE</td><td>Funde com #26 via toggle empresa.</td></tr>
+          <tr><td class="aba">28</td><td class="aba">28. Histórico Top 200</td><td>Dimensão</td><td><span class="pill l4">L4</span></td><td>M4.4</td><td class="act demote">DEMOTE</td><td>Lista bruta — consulta por exceção.</td></tr>
+          <tr><td class="aba">29</td><td class="aba">29. Achados Finais</td><td>Síntese</td><td><span class="pill l0 dim">L0+L4</span></td><td>M0.2 + M4.1</td><td class="act elevate">ELEVATE</td><td>Top 3 críticos → L0; demais → L4.1.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 4 — Reading sequence -->
+    <section>
+      <div class="sec-head">
+        <span class="sec-num">04</span>
+        <h2 class="sec-title">Fluxo de leitura · 3 perfis, 3 tempos</h2>
+        <span class="sec-tag">Como cada pessoa usa o painel</span>
+      </div>
+      <p class="sec-sub">
+        A mesma ferramenta serve três audiências diferentes. O design garante que ninguém precise atravessar a hierarquia inteira pra
+        responder o que precisa.
+      </p>
+      <div class="reading">
+        <div class="read-col">
+          <div class="read-time">T+90 SEGUNDOS</div>
+          <div class="read-who">DIRETORIA · SÓCIOS</div>
+          <div class="read-title">Está tudo bem?</div>
+          <div class="read-body">
+            Abre o painel, vê 6 KPIs e os 3 alertas. Se nenhum sinal vermelho, fecha.
+            Se houver, sabe pra qual módulo de L2 ir.
+          </div>
+          <ul class="read-list">
+            <li>L0 · Pulso financeiro</li>
+            <li>L0 · 3 alertas críticos</li>
+            <li>L0 · Curva 29 meses</li>
+          </ul>
+        </div>
+        <div class="read-col">
+          <div class="read-time">T+5 — 15 MIN</div>
+          <div class="read-who">CFO · CONTROLLER</div>
+          <div class="read-title">Por quê?</div>
+          <div class="read-body">
+            Entra em L1/L2 com toggle empresa. Compara CAR vs CAP no mês, vê concentração SUSAM,
+            mede gap intercompany. Decide se promove tema para reunião.
+          </div>
+          <ul class="read-list">
+            <li>L1 · P&L mensal + sazonalidade</li>
+            <li>L2 · Reconciliação intercompany</li>
+            <li>L2 · Custo financeiro</li>
+          </ul>
+        </div>
+        <div class="read-col">
+          <div class="read-time">CONTÍNUO</div>
+          <div class="read-who">ANALISTA · AUDITORIA</div>
+          <div class="read-title">Onde foi parar?</div>
+          <div class="read-body">
+            Drill em L3 por clifor/conta/mês. Atualiza queries pendentes em L4. Fecha anomalias.
+            Cadastros (clifor, plano) estão sempre acessíveis no painel lateral.
+          </div>
+          <ul class="read-list">
+            <li>L3 · CAP/CAR detalhado · heatmap</li>
+            <li>L3 · Despesas 4xx · contratos</li>
+            <li>L4 · Achados, queries, dimensões</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5 — Next decisions -->
+    <section>
+      <div class="sec-head">
+        <span class="sec-num">05</span>
+        <h2 class="sec-title">Decisões para destravar · me devolve antes da UI</h2>
+        <span class="sec-tag">Bloqueios</span>
+      </div>
+      <p class="sec-sub">
+        Antes de eu desenhar as telas de cada camada, preciso confirmar 5 pontos. Cada um muda muita coisa visualmente.
+      </p>
+      <div class="reading">
+        <div class="read-col">
+          <div class="read-time">D1</div>
+          <div class="read-who">PERFIL PRIMÁRIO</div>
+          <div class="read-title">Quem usa mais?</div>
+          <div class="read-body">L0 é para diretoria <em>ou</em> CFO? A tela inicial muda completamente — síntese de 6 KPIs (diretoria) vs P&L mensal (CFO).</div>
+        </div>
+        <div class="read-col">
+          <div class="read-time">D2</div>
+          <div class="read-who">CONSOLIDAÇÃO</div>
+          <div class="read-title">Como tratar o intercompany?</div>
+          <div class="read-body">Mostrar REUN+DESCART somado bruto, ou consolidado (eliminando o intercompany)? Os R$ 16,6M de gap forçam escolha contábil.</div>
+        </div>
+        <div class="read-col">
+          <div class="read-time">D3</div>
+          <div class="read-who">JANELA TEMPORAL</div>
+          <div class="read-title">Default 29m ou últimos 12m?</div>
+          <div class="read-body">29m mostra história inteira; 12m é mais útil pra tomada de decisão corrente. Filtro global, mas precisa de padrão.</div>
+        </div>
+      </div>
+      <div class="reading" style="margin-top:16px;">
+        <div class="read-col">
+          <div class="read-time">D4</div>
+          <div class="read-who">REAL-TIME?</div>
+          <div class="read-title">Dado live ou snapshot?</div>
+          <div class="read-body">Conectado ao SGC/SGC2 (atualiza diário) ou snapshot mensal? Define se existem datas "em aberto" e estados intermediários.</div>
+        </div>
+        <div class="read-col">
+          <div class="read-time">D5</div>
+          <div class="read-who">CENÁRIOS</div>
+          <div class="read-title">Simulações ou só real?</div>
+          <div class="read-body">Vale a pena o eixo "sem SUSAM" / "com IC conciliado"? Útil para diretoria, custo médio para construir.</div>
+        </div>
+        <div class="read-col">
+          <div class="read-time">D6</div>
+          <div class="read-who">FORMATO</div>
+          <div class="read-title">Web app, slide ou Excel++?</div>
+          <div class="read-body">Hi-fi interativo (recomendo), deck mensal estático, ou um Excel reorganizado seguindo essa IA? Cada um é viável.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="doc-foot">
+      <div>
+        <strong>Próximo passo recomendado</strong>
+        Wireframe da Camada 0 (Síntese Executiva) em alta fidelidade, com os 6 KPIs reais e os 3 alertas posicionados.
+      </div>
+      <div>
+        <strong>Risco principal</strong>
+        Concentração SUSAM (87,6%). Toda a operação REUNIDOS depende de um contrato. O painel precisa tornar isso impossível de ignorar.
+      </div>
+      <div>
+        <strong>Fonte da verdade</strong>
+        Dashboard_LRA_v6_FINAL.xlsx · 29 abas · 29 meses · jan/24 → mai/26 · SGC + SGC2.
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
