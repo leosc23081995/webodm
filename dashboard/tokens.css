@@ -1,0 +1,169 @@
+/* Engineering blueprint design tokens — shared across all variations */
+:root {
+  /* Blueprint palette */
+  --bp-void: #050a14;
+  --bp-deep: #0a1424;
+  --bp-paper: #0d1a2f;
+  --bp-paper-2: #122340;
+  --bp-grid: rgba(82, 184, 255, 0.06);
+  --bp-grid-strong: rgba(82, 184, 255, 0.14);
+  --bp-line: #2a4a7a;
+  --bp-line-soft: rgba(120, 170, 230, 0.25);
+  --bp-line-strong: #5aa8ff;
+
+  /* Text */
+  --bp-ink: #e8f1ff;
+  --bp-ink-2: #aac4e6;
+  --bp-ink-3: #7090b8;
+  --bp-ink-4: #506a8c;
+
+  /* Accents */
+  --bp-cyan: #5ee0ff;
+  --bp-cyan-dim: #2a98c4;
+  --bp-amber: #ffb454;
+  --bp-amber-dim: #c47d2a;
+  --bp-red: #ff5a5a;
+  --bp-red-dim: #b03030;
+  --bp-green: #5fdc92;
+  --bp-green-dim: #2a8c52;
+  --bp-violet: #b48cff;
+  --bp-mindray: #0066b3;
+
+  /* Fonts */
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  --font-sans: "Inter", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+
+  /* Shape */
+  --r-0: 0;
+  --r-1: 2px;
+  --r-2: 4px;
+  --r-3: 6px;
+}
+
+/* Blueprint base */
+.bp-root {
+  background: var(--bp-deep);
+  color: var(--bp-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  position: relative;
+  overflow: hidden;
+}
+.bp-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--bp-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+.bp-root::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--bp-grid-strong) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bp-grid-strong) 1px, transparent 1px);
+  background-size: 120px 120px;
+  pointer-events: none;
+}
+
+/* Crosshair corner markers */
+.bp-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--bp-line-strong);
+}
+.bp-corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+.bp-corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+.bp-corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+.bp-corner.br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+/* Mono labels */
+.bp-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.bp-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--bp-ink-3);
+  text-transform: uppercase;
+}
+.bp-tag-strong { color: var(--bp-cyan); }
+
+/* Cards */
+.bp-card {
+  background: linear-gradient(180deg, rgba(20, 40, 70, 0.6), rgba(10, 25, 50, 0.5));
+  border: 1px solid var(--bp-line);
+  border-radius: var(--r-2);
+  position: relative;
+}
+.bp-card-glow {
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 255, 0.08),
+    0 0 0 1px rgba(90, 168, 255, 0.04);
+}
+
+/* Connecting line styles for SVG overlays */
+.bp-line-svg { stroke: var(--bp-line-strong); stroke-width: 1.25; fill: none; }
+.bp-line-svg.dashed { stroke-dasharray: 4 4; }
+.bp-line-svg.dotted { stroke-dasharray: 1 3; }
+.bp-line-svg.stat { stroke: var(--bp-amber); }
+.bp-line-svg.error { stroke: var(--bp-red); }
+.bp-line-svg.ok { stroke: var(--bp-green); }
+
+/* Buttons & chips */
+.bp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid var(--bp-line);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bp-ink-2);
+  background: rgba(10, 25, 50, 0.4);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.bp-chip:hover { border-color: var(--bp-cyan); color: var(--bp-cyan); }
+.bp-chip.active {
+  border-color: var(--bp-cyan);
+  background: rgba(94, 224, 255, 0.12);
+  color: var(--bp-cyan);
+}
+.bp-chip.stat.active {
+  border-color: var(--bp-amber);
+  background: rgba(255, 180, 84, 0.14);
+  color: var(--bp-amber);
+}
+
+/* Scrollbars (kept subtle) */
+.bp-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.bp-scroll::-webkit-scrollbar-thumb { background: var(--bp-line); border-radius: 3px; }
+.bp-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* Pulse animation */
+@keyframes bp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.bp-pulse { animation: bp-pulse 1.6s ease-in-out infinite; }
+
+@keyframes bp-flow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -16; }
+}
+.bp-flow { stroke-dasharray: 4 4; animation: bp-flow 1.2s linear infinite; }
+
+@keyframes bp-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+.bp-blink { animation: bp-blink 1s steps(2) infinite; }
