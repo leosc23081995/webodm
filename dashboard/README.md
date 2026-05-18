@@ -27,6 +27,12 @@ dashboard/
 │   └── PREVISAO_DE_CONSUMO_TUBOS.xlsx
 ├── scripts/
 │   └── build_data.py        # Regera dashboard-data.js a partir das planilhas
+├── server/
+│   ├── app.py               # FastAPI app (auth básica + upload)
+│   ├── requirements.txt
+│   ├── run.sh
+│   ├── Dockerfile
+│   └── templates/upload.html
 └── screenshots/
 ```
 
@@ -53,11 +59,49 @@ Isso reescreve `dashboard/dashboard-data.js` com `window.DASH = {...}`.
 
 ## Rodar local
 
+### Modo simples (sem auth, sem upload — só servir o HTML estático)
+
 ```bash
 cd dashboard
 python3 -m http.server 8080
 # abrir http://localhost:8080/Dashboard%20LRA.html
 ```
+
+### Modo aplicação (FastAPI + auth básica + upload pela UI)
+
+```bash
+pip install -r dashboard/server/requirements.txt
+DASHBOARD_USER=admin DASHBOARD_PASS=senha-forte \
+  ./dashboard/server/run.sh
+# abrir http://localhost:8000/  → Dashboard LRA (login)
+#       http://localhost:8000/upload  → trocar as planilhas
+#       http://localhost:8000/api/dash → JSON
+```
+
+Credenciais via env: `DASHBOARD_USER` / `DASHBOARD_PASS` (default `admin`/`admin` — **troque em produção**).
+
+#### Rotas
+
+| Rota | Descrição |
+|------|-----------|
+| `/` | Dashboard LRA (telas L0–L5) |
+| `/ia` | Dashboard de Arquitetura de Informação |
+| `/flow` | Mindray Flow |
+| `/upload` | Form para enviar as duas planilhas; regenera `window.DASH` |
+| `/api/dash` | Retorna o `DASH` atual como JSON |
+| `/health` | Healthcheck (sem auth) |
+
+#### Docker
+
+```bash
+docker build -f dashboard/server/Dockerfile -t dashboard-lra .
+docker run -p 8000:8000 \
+  -e DASHBOARD_USER=admin -e DASHBOARD_PASS=senha-forte \
+  -v "$(pwd)/dashboard/data:/app/dashboard/data" \
+  dashboard-lra
+```
+
+O volume em `/app/dashboard/data` persiste as planilhas entre restarts.
 
 ## Estrutura de `window.DASH`
 

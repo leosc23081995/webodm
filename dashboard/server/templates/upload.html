@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Atualizar dados · Dashboard LRA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0d12;
+      --card: #11151c;
+      --line: #1f2632;
+      --ink: #e6ecf2;
+      --ink-2: #92a3b5;
+      --cyan: #4ad6ff;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; }
+    body { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 64px 24px; }
+    .wrap { max-width: 720px; width: 100%; }
+    h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+    .sub { color: var(--ink-2); font-size: 14px; margin: 0 0 32px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+    label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); margin-bottom: 8px; }
+    input[type=file] { display: block; width: 100%; padding: 12px; background: #0a0d12; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); font-family: inherit; }
+    input[type=file]::file-selector-button { background: var(--cyan); color: #001620; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 12px; }
+    .row { margin-bottom: 20px; }
+    button { background: var(--cyan); color: #001620; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; }
+    button:hover { filter: brightness(1.1); }
+    .links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
+    .links a { color: var(--cyan); text-decoration: none; font-size: 14px; font-weight: 500; }
+    .links a:hover { text-decoration: underline; }
+    .stats { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-2); line-height: 1.7; }
+    .stats b { color: var(--ink); }
+    .msg { padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }
+    .msg.ok { background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.3); color: var(--ok); }
+    .small { font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+    .user { font-size: 12px; color: var(--ink-2); float: right; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="user">Logado como <b>{{ user }}</b></div>
+    <h1>Atualizar dados do dashboard</h1>
+    <p class="sub">Faça upload das duas planilhas para regenerar <code>window.DASH</code>.</p>
+
+    {% if message %}
+      <div class="msg ok">{{ message }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="card">
+      <div class="row">
+        <label>WB2 — Categoria completa (.xlsx)</label>
+        <input type="file" name="wb2" accept=".xlsx" required />
+        <div class="small">Esperado: abas "1. Sumário Categorias", "2. Lista Fabricantes", "3. Fab x Mês x Categoria", "4. EQUIPAMENTOS", "5. CONSUMIVEIS Top500", "7. COMODATO", "8. DEVOLUCAO", "9. TRANSF INTERNA".</div>
+      </div>
+      <div class="row">
+        <label>Previsão de consumo de tubos (.xlsx)</label>
+        <input type="file" name="previsao" accept=".xlsx" required />
+        <div class="small">Esperado: abas "RESUMO" e "MATRIZ".</div>
+      </div>
+      <button type="submit">Processar e atualizar dashboard</button>
+    </form>
+
+    {% if stats %}
+      <div class="card">
+        <div class="stats">
+          <div>Status atual</div>
+          {% if stats.bytes %}
+            <div><b>dashboard-data.js</b>: {{ "{:,}".format(stats.bytes) }} bytes</div>
+          {% endif %}
+          {% if stats.months %}
+            <div><b>meses</b>: {{ stats.months }}</div>
+            <div><b>categorias</b>: {{ stats.categorias }}</div>
+            <div><b>fabricantes</b>: {{ stats.fabricantes }}</div>
+            <div><b>equipamentos</b>: {{ stats.equipamentos }}</div>
+            <div><b>consumíveis</b>: {{ stats.consumiveis }}</div>
+            <div><b>previsão produtos</b>: {{ stats.previsaoProdutos }}</div>
+            <div><b>anomalias</b>: {{ stats.anomalias }}</div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="links">
+      <a href="/">→ Dashboard LRA</a>
+      <a href="/ia">→ Dashboard IA</a>
+      <a href="/flow">→ Mindray Flow</a>
+      <a href="/api/dash">→ JSON</a>
+    </div>
+  </div>
+</body>
+</html>
